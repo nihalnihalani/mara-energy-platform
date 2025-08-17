@@ -46,6 +46,7 @@ async function initializeSystem() {
             systemInitialized = true;
             updateSystemStatus('online');
             document.getElementById('optimizeBtn').disabled = false;
+            document.getElementById('initializeBtn').disabled = true; // Disable after successful initialization
             
             showNotification('System initialized successfully with dummy data!', 'success');
             

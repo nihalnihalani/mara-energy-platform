@@ -710,7 +710,7 @@ body::before {
 /* Notifications */
 .notifications {
     position: fixed;
-    top: 1rem;
+    top: 5rem; /* Adjusted to not overlap with header */
     right: 1rem;
     z-index: 1001;
     display: flex;
