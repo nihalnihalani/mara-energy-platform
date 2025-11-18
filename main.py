@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,23 +17,52 @@ from dataclasses import dataclass
 from anthropic import Anthropic
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
+import logging
+from sqlalchemy.orm import Session
+
+# Import database functions
+from database import (
+    get_db, get_system_state, update_system_state,
+    get_site_inventory, update_site_inventory, get_all_site_inventories,
+    add_optimization_history, get_optimization_history,
+    add_sla_commitment, get_active_sla_commitments,
+    add_pricing_data, get_latest_pricing,
+    get_site_allocation, update_site_allocation
+)
 
 # Load environment variables
 load_dotenv("config.env")
 
+# Configure logging
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(os.getenv("LOG_FILE", "app.log")),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    asyncio.create_task(periodic_price_update())
+    logger.info("Application starting up...")
+    # Note: Background tasks removed for Vercel serverless compatibility
     yield
-    # Shutdown (if needed)
+    # Shutdown
+    logger.info("Application shutting down...")
 
 app = FastAPI(title="SLA-Smart Energy Arbitrage Platform", version="1.0.0", lifespan=lifespan)
 
-# CORS middleware
+# Get allowed origins from environment
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+# CORS middleware with specific origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,7 +77,13 @@ CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 # Initialize Claude client if API key is available
 claude_client = None
 if CLAUDE_API_KEY and CLAUDE_API_KEY != "your_claude_api_key_here":
-    claude_client = Anthropic(api_key=CLAUDE_API_KEY)
+    try:
+        claude_client = Anthropic(api_key=CLAUDE_API_KEY)
+        logger.info("Claude AI client initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize Claude client: {e}")
+else:
+    logger.warning("Claude API key not configured - using mock responses")
 
 # Multi-site configuration with enhanced data
 MULTI_SITE_CONFIG = {
@@ -142,17 +177,8 @@ SLA_TIERS = {
     "spot": {"uptime": 0.0, "price_multiplier": 0.4, "priority": 4}
 }
 
-# Global state
-is_initialized = False
-site_hardware_inventory = {}
-global_state = {
-    "mara_inventory": None,
-    "current_prices": None,
-    "site_allocations": {},
-    "sla_commitments": {"premium": 0, "standard": 0, "flexible": 0, "spot": 0},
-    "total_revenue": 0,
-    "optimization_history": []
-}
+# Note: Global state replaced with database storage
+# All state now persists in SQLite database via database.py
 
 # Pydantic models
 class SiteStatus(BaseModel):
@@ -236,7 +262,7 @@ def get_dummy_mara_prices():
         "energy_price": 0.65 + time_factor + random_factor,
         "hash_price": 8.5 + time_factor * 2 + random_factor * 2,
         "token_price": 2.9 + time_factor + random_factor,
-        "timestamp": base_time.isoformat(),
+        "timestamp": base_time,  # Return datetime object, not string
         "source": "dummy_data"
     }
 
@@ -255,12 +281,12 @@ def get_dummy_mara_inventory():
         "source": "dummy_data"
     }
 
-def calculate_site_revenue(site_id: str, allocation: Dict, prices: Dict, site_config: Dict) -> float:
+def calculate_site_revenue(site_id: str, allocation: Dict, prices: Dict, site_config: Dict, mara_inventory: Dict = None) -> float:
     """Calculate revenue for a specific site allocation"""
-    if not global_state["mara_inventory"]:
-        return 0
+    if not mara_inventory:
+        mara_inventory = get_dummy_mara_inventory()
     
-    inventory = global_state["mara_inventory"]
+    inventory = mara_inventory
     total_revenue = 0
     
     # AI Inference revenue
@@ -295,6 +321,7 @@ async def claude_optimizer(site_data: Dict, sla_commitments: Dict) -> str:
     """Use Claude to optimize global allocation"""
     try:
         if not claude_client:
+            logger.info("Using mock Claude optimization (API key not configured)")
             return """
             MOCK CLAUDE OPTIMIZATION (No API Key Configured):
             
@@ -322,10 +349,42 @@ async def claude_optimizer(site_data: Dict, sla_commitments: Dict) -> str:
             ⚠️  To enable real Claude AI optimization, add your Claude API key to config.env
             """
         
-        # Real Claude API call would go here
-        return "Claude optimization completed successfully"
+        # Real Claude API call
+        logger.info("Calling Claude AI for optimization...")
+        
+        # Prepare prompt for Claude
+        prompt = f"""You are an AI energy arbitrage optimizer for a global data center network. 
+        Analyze the following data and provide optimization recommendations:
+
+        SITE DATA:
+        {json.dumps(site_data, indent=2)}
+
+        SLA COMMITMENTS:
+        {json.dumps(sla_commitments, indent=2)}
+
+        Please analyze:
+        1. Which sites should handle Premium SLA workloads (99.9% uptime) based on cooling efficiency and reliability?
+        2. How to distribute compute resources to maximize revenue while minimizing energy costs?
+        3. Climate arbitrage opportunities (routing to cold sites to reduce cooling costs)?
+        4. Timezone optimization (routing AI inference to sites during peak business hours)?
+        5. Specific GPU/ASIC/miner allocation recommendations per site.
+
+        Provide a concise analysis with specific recommendations."""
+
+        message = claude_client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        reasoning = message.content[0].text
+        logger.info("Claude AI optimization completed successfully")
+        return reasoning
         
     except Exception as e:
+        logger.error(f"Claude optimization error: {e}")
         return f"Claude optimization error: {e}. Using fallback strategy based on cooling efficiency and energy costs."
 
 def distribute_hardware_across_sites(mara_inventory: Dict) -> Dict:
@@ -399,397 +458,501 @@ async def read_root():
     return FileResponse("static/index.html")
 
 @app.post("/api/initialize")
-async def initialize_system():
-    global is_initialized, site_hardware_inventory
-    
+async def initialize_system(db: Session = Depends(get_db)):
     try:
+        logger.info("Initializing system...")
+        
         # Use dummy data instead of broken MARA API
         pricing_data = get_dummy_mara_prices()
         mara_inventory = get_dummy_mara_inventory()
         
-        # Update global_state
-        global_state["current_prices"] = pricing_data
-        global_state["mara_inventory"] = mara_inventory
+        # Store in database
+        add_pricing_data(db, pricing_data)
         
-        # Distribute hardware across sites
-        site_hardware_inventory = distribute_hardware_across_sites(mara_inventory)
+        # Convert datetime to string for JSON storage
+        pricing_data_json = pricing_data.copy()
+        pricing_data_json['timestamp'] = pricing_data['timestamp'].isoformat()
         
-        is_initialized = True
+        update_system_state(
+            db,
+            is_initialized=True,
+            mara_inventory=mara_inventory,
+            current_prices=pricing_data_json
+        )
+        
+        # Distribute hardware across sites and store in database
+        site_inventories = distribute_hardware_across_sites(mara_inventory)
+        for site_id, inventory in site_inventories.items():
+            update_site_inventory(db, site_id, inventory)
+        
+        logger.info(f"System initialized successfully with {len(site_inventories)} sites")
         
         return {
             "status": "success", 
             "message": "System initialized with dummy data (MARA API unavailable)",
             "pricing_data": pricing_data,
             "mara_inventory": mara_inventory,
-            "total_sites": len(site_hardware_inventory),
-            "sample_site_inventory": list(site_hardware_inventory.keys())[:3],
+            "total_sites": len(site_inventories),
+            "sample_site_inventory": list(site_inventories.keys())[:3],
             "data_source": "dummy_data"
         }
     except Exception as e:
-        return {"status": "error", "message": f"Failed to initialize: {str(e)}"}
+        logger.error(f"Failed to initialize system: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to initialize: {str(e)}")
 
 @app.get("/api/sites/status")
-async def get_sites_status():
+async def get_sites_status(db: Session = Depends(get_db)):
     """Get status of all sites including distributed hardware inventory"""
-    global site_hardware_inventory, is_initialized
-    
-    if not is_initialized:
-        return {"error": "System not initialized. Call /api/initialize first"}
-    
-    sites = []
-    
-    for site_id, site_config in MULTI_SITE_CONFIG.items():
-        # Get site-specific hardware inventory
-        site_inventory = site_hardware_inventory.get(site_id, {})
+    try:
+        # Check if system is initialized
+        system_state = get_system_state(db)
+        if not system_state.is_initialized:
+            return {"error": "System not initialized. Call /api/initialize first"}
         
-        # Simulate current usage (random allocation for demo)
-        current_allocation = {
+        # Get site inventories from database
+        site_hardware_inventory = get_all_site_inventories(db)
+        
+        sites = []
+        
+        for site_id, site_config in MULTI_SITE_CONFIG.items():
+            # Get site-specific hardware inventory
+            site_inventory = site_hardware_inventory.get(site_id, {})
+            
+            # Simulate current usage (random allocation for demo)
+            current_allocation = {
             "gpu_compute": random.randint(20, min(80, site_inventory.get("inference", {}).get("gpu", {}).get("available", 100))),
             "asic_compute": random.randint(5, min(30, site_inventory.get("inference", {}).get("asic", {}).get("available", 50))),
             "air_miners": random.randint(10, min(40, site_inventory.get("miners", {}).get("air", {}).get("available", 50))),
             "hydro_miners": random.randint(5, min(20, site_inventory.get("miners", {}).get("hydro", {}).get("available", 20))),
-            "immersion_miners": random.randint(2, min(15, site_inventory.get("miners", {}).get("immersion", {}).get("available", 10)))
-        }
-        
-        # Calculate power usage based on actual hardware
-        power_used = 0
-        if site_inventory:
-            power_used += current_allocation["gpu_compute"] * site_inventory["inference"]["gpu"]["power"]
-            power_used += current_allocation["asic_compute"] * site_inventory["inference"]["asic"]["power"]
-            power_used += current_allocation["air_miners"] * site_inventory["miners"]["air"]["power"]
-            power_used += current_allocation["hydro_miners"] * site_inventory["miners"]["hydro"]["power"]
-            power_used += current_allocation["immersion_miners"] * site_inventory["miners"]["immersion"]["power"]
-        
-        # Weather simulation
-        weather = simulate_weather(site_config["climate"])
-        
-        # Calculate site-specific pricing using dummy data
-        site_pricing = {}
-        if global_state["current_prices"]:
-            energy_multiplier = site_config["energy_cost_multiplier"]
-            site_pricing = {
-                "hash_price": global_state["current_prices"].get("hash_price", 1.0) * energy_multiplier,
-                "token_price": global_state["current_prices"].get("token_price", 1.0) * energy_multiplier,
-                "energy_price": global_state["current_prices"].get("energy_price", 1.0) * energy_multiplier
+                "immersion_miners": random.randint(2, min(15, site_inventory.get("miners", {}).get("immersion", {}).get("available", 10)))
             }
-        
-        # Calculate revenue based on current allocation and pricing
-        revenue = 0
-        if site_pricing and current_allocation:
-            # AI inference revenue
-            gpu_revenue = (current_allocation.get("gpu_compute", 0) * 
-                          site_inventory.get("inference", {}).get("gpu", {}).get("tokens", 1000) * 
-                          site_pricing.get("token_price", 1.0) * 0.001)  # Scale down for realistic numbers
             
-            asic_revenue = (current_allocation.get("asic_compute", 0) * 
-                           site_inventory.get("inference", {}).get("asic", {}).get("tokens", 50000) * 
-                           site_pricing.get("token_price", 1.0) * 0.001)
+            # Calculate power usage based on actual hardware
+            power_used = 0
+            if site_inventory:
+                power_used += current_allocation["gpu_compute"] * site_inventory["inference"]["gpu"]["power"]
+                power_used += current_allocation["asic_compute"] * site_inventory["inference"]["asic"]["power"]
+                power_used += current_allocation["air_miners"] * site_inventory["miners"]["air"]["power"]
+                power_used += current_allocation["hydro_miners"] * site_inventory["miners"]["hydro"]["power"]
+                power_used += current_allocation["immersion_miners"] * site_inventory["miners"]["immersion"]["power"]
             
-            # Mining revenue
-            mining_revenue = (
-                (current_allocation.get("air_miners", 0) * site_inventory.get("miners", {}).get("air", {}).get("hashrate", 1000) * site_pricing.get("hash_price", 8.5) * 0.001) +
-                (current_allocation.get("hydro_miners", 0) * site_inventory.get("miners", {}).get("hydro", {}).get("hashrate", 5000) * site_pricing.get("hash_price", 8.5) * 0.001) +
-                (current_allocation.get("immersion_miners", 0) * site_inventory.get("miners", {}).get("immersion", {}).get("hashrate", 10000) * site_pricing.get("hash_price", 8.5) * 0.001)
-            )
+            # Weather simulation
+            weather = simulate_weather(site_config["climate"])
             
-            revenue = gpu_revenue + asic_revenue + mining_revenue
+            # Calculate site-specific pricing using dummy data
+            current_prices = get_latest_pricing(db) or get_dummy_mara_prices()
+            site_pricing = {}
+            if current_prices:
+                energy_multiplier = site_config["energy_cost_multiplier"]
+                site_pricing = {
+                    "hash_price": current_prices.get("hash_price", 1.0) * energy_multiplier,
+                    "token_price": current_prices.get("token_price", 1.0) * energy_multiplier,
+                    "energy_price": current_prices.get("energy_price", 1.0) * energy_multiplier
+                }
             
-            # Apply timezone demand multiplier
-            demand_multiplier = calculate_demand_multiplier(site_config["location"]["timezone"])
-            revenue *= demand_multiplier
-        
-        site_status = {
-            "site_id": site_id,
-            "id": site_id,
-            "name": site_config["name"],
-            "location": site_config["location"],
-            "timezone": site_config["location"]["timezone"],
+            # Calculate revenue based on current allocation and pricing
+            revenue = 0
+            if site_pricing and current_allocation:
+                # AI inference revenue
+                gpu_revenue = (current_allocation.get("gpu_compute", 0) * 
+                              site_inventory.get("inference", {}).get("gpu", {}).get("tokens", 1000) * 
+                              site_pricing.get("token_price", 1.0) * 0.001)  # Scale down for realistic numbers
+                
+                asic_revenue = (current_allocation.get("asic_compute", 0) * 
+                               site_inventory.get("inference", {}).get("asic", {}).get("tokens", 50000) * 
+                               site_pricing.get("token_price", 1.0) * 0.001)
+                
+                # Mining revenue
+                mining_revenue = (
+                    (current_allocation.get("air_miners", 0) * site_inventory.get("miners", {}).get("air", {}).get("hashrate", 1000) * site_pricing.get("hash_price", 8.5) * 0.001) +
+                    (current_allocation.get("hydro_miners", 0) * site_inventory.get("miners", {}).get("hydro", {}).get("hashrate", 5000) * site_pricing.get("hash_price", 8.5) * 0.001) +
+                    (current_allocation.get("immersion_miners", 0) * site_inventory.get("miners", {}).get("immersion", {}).get("hashrate", 10000) * site_pricing.get("hash_price", 8.5) * 0.001)
+                )
+                
+                revenue = gpu_revenue + asic_revenue + mining_revenue
+                
+                # Apply timezone demand multiplier
+                demand_multiplier = calculate_demand_multiplier(site_config["location"]["timezone"])
+                revenue *= demand_multiplier
             
-            # Hardware inventory (actual available hardware)
-            "hardware_inventory": site_inventory,
+            site_status = {
+                "site_id": site_id,
+                "id": site_id,
+                "name": site_config["name"],
+                "location": site_config["location"],
+                "timezone": site_config["location"]["timezone"],
+                
+                # Hardware inventory (actual available hardware)
+                "hardware_inventory": site_inventory,
+                
+                # Current allocation
+                "allocation": current_allocation,
+                
+                # Power and capacity
+                "power_used": power_used,
+                "power_capacity": site_config["power_capacity"],
+                "power_utilization": min(100, (power_used / site_config["power_capacity"]) * 100),
+                
+                # Environmental
+                "weather": weather,
+                "current_temp": weather["temperature"],  # Add current_temp for frontend compatibility
+                "local_time": get_local_time(site_config["location"]["timezone"]),  # Add local_time for frontend compatibility
+                "cooling_efficiency": site_config["climate"]["cooling_efficiency"],
+                
+                # Economics
+                "pricing": site_pricing,
+                "energy_price": site_pricing.get("energy_price", 1.0) if site_pricing else 1.0,  # Add energy_price for frontend compatibility
+                "energy_cost_multiplier": site_config["energy_cost_multiplier"],
+                "revenue": revenue,
+                
+                # Performance metrics
+                "uptime": random.uniform(98.5, 99.9),
+                "efficiency_score": calculate_efficiency_score(site_config, weather),
+                
+                "last_updated": datetime.now().isoformat()
+            }
             
-            # Current allocation
-            "allocation": current_allocation,
-            
-            # Power and capacity
-            "power_used": power_used,
-            "power_capacity": site_config["power_capacity"],
-            "power_utilization": min(100, (power_used / site_config["power_capacity"]) * 100),
-            
-            # Environmental
-            "weather": weather,
-            "current_temp": weather["temperature"],  # Add current_temp for frontend compatibility
-            "local_time": get_local_time(site_config["location"]["timezone"]),  # Add local_time for frontend compatibility
-            "cooling_efficiency": site_config["climate"]["cooling_efficiency"],
-            
-            # Economics
-            "pricing": site_pricing,
-            "energy_price": site_pricing.get("energy_price", 1.0) if site_pricing else 1.0,  # Add energy_price for frontend compatibility
-            "energy_cost_multiplier": site_config["energy_cost_multiplier"],
-            "revenue": revenue,
-            
-            # Performance metrics
-            "uptime": random.uniform(98.5, 99.9),
-            "efficiency_score": calculate_efficiency_score(site_config, weather),
-            
+            sites.append(site_status)
+    
+        return {
+            "sites": sites,
+            "total_sites": len(sites),
+            "global_metrics": calculate_global_metrics(sites),
+            "data_source": "dummy_data",
             "last_updated": datetime.now().isoformat()
         }
-        
-        sites.append(site_status)
-    
-    return {
-        "sites": sites,
-        "total_sites": len(sites),
-        "global_metrics": calculate_global_metrics(sites),
-        "data_source": "dummy_data",
-        "last_updated": datetime.now().isoformat()
-    }
+    except Exception as e:
+        logger.error(f"Error getting sites status: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get sites status: {str(e)}")
 
 @app.post("/api/optimize")
-async def optimize_global_allocation():
+async def optimize_global_allocation(db: Session = Depends(get_db)):
     """Run global optimization across all sites"""
-    if not is_initialized:
-        raise HTTPException(status_code=400, detail="System not initialized")
-    
-    # Get current site data
-    sites_response = await get_sites_status()
-    
-    if "error" in sites_response:
-        raise HTTPException(status_code=400, detail=sites_response["error"])
-    
-    site_data = {site["site_id"]: site for site in sites_response["sites"]}
-    
-    # Run Claude optimization
-    claude_reasoning = await claude_optimizer(site_data, global_state["sla_commitments"])
-    
-    # Implement basic optimization logic
-    total_revenue = 0
-    climate_savings = 0
-    
-    # Simple optimization: allocate more resources to efficient sites
-    for site_id, site_config in MULTI_SITE_CONFIG.items():
-        cooling_efficiency = site_config["climate"]["cooling_efficiency"]
-        energy_multiplier = site_config["energy_cost_multiplier"]
+    try:
+        # Check if system is initialized
+        system_state = get_system_state(db)
+        if not system_state.is_initialized:
+            raise HTTPException(status_code=400, detail="System not initialized")
         
-        # Allocate more GPU compute to efficient sites
-        gpu_allocation = int(50 * cooling_efficiency / energy_multiplier)
-        asic_allocation = int(30 * (1 - cooling_efficiency))  # ASIC mining for less efficient sites
+        logger.info("Starting global optimization...")
         
-        # Store allocation
-        global_state["site_allocations"][site_id] = {
-            "gpu_compute": gpu_allocation,
-            "asic_compute": asic_allocation,
-            "immersion_miners": 10 if cooling_efficiency > 0.7 else 5
+        # Get current site data
+        sites_response = await get_sites_status(db)
+        
+        if "error" in sites_response:
+            raise HTTPException(status_code=400, detail=sites_response["error"])
+        
+        site_data = {site["site_id"]: site for site in sites_response["sites"]}
+        
+        # Get SLA commitments from database
+        sla_commitments = get_active_sla_commitments(db)
+        
+        # Run Claude optimization
+        claude_reasoning = await claude_optimizer(site_data, sla_commitments)
+    
+        # Implement basic optimization logic
+        total_revenue = 0
+        climate_savings = 0
+        
+        # Get current prices from database
+        current_prices = get_latest_pricing(db) or get_dummy_mara_prices()
+        
+        # Simple optimization: allocate more resources to efficient sites
+        for site_id, site_config in MULTI_SITE_CONFIG.items():
+            cooling_efficiency = site_config["climate"]["cooling_efficiency"]
+            energy_multiplier = site_config["energy_cost_multiplier"]
+            
+            # Allocate more GPU compute to efficient sites
+            gpu_allocation = int(50 * cooling_efficiency / energy_multiplier)
+            asic_allocation = int(30 * (1 - cooling_efficiency))  # ASIC mining for less efficient sites
+            
+            # Create allocation
+            allocation = {
+                "gpu_compute": gpu_allocation,
+                "asic_compute": asic_allocation,
+                "immersion_miners": 10 if cooling_efficiency > 0.7 else 5
+            }
+            
+            # Store allocation in database
+            update_site_allocation(db, site_id, allocation)
+            
+            # Calculate revenue
+            site_revenue = calculate_site_revenue(
+                site_id, 
+                allocation, 
+                current_prices, 
+                site_config,
+                system_state.mara_inventory
+            )
+            total_revenue += site_revenue
+            
+            # Calculate climate savings (higher efficiency = more savings)
+            if cooling_efficiency > 0.8:
+                climate_savings += site_revenue * 0.3  # 30% savings for high efficiency
+    
+        # Create optimization result
+        optimization_data = {
+            "timestamp": datetime.now(),
+            "total_revenue": total_revenue,
+            "climate_savings": climate_savings,
+            "timezone_optimization": total_revenue * 0.15,  # 15% from timezone optimization
+            "sla_performance": {"premium": 99.9, "standard": 96.2, "flexible": 91.5, "spot": 85.0},
+            "claude_reasoning": claude_reasoning
         }
         
-        # Calculate revenue
-        site_revenue = calculate_site_revenue(
-            site_id, 
-            global_state["site_allocations"][site_id], 
-            global_state["current_prices"], 
-            site_config
-        )
-        total_revenue += site_revenue
+        # Store in database
+        add_optimization_history(db, optimization_data)
+        update_system_state(db, total_revenue=total_revenue)
         
-        # Calculate climate savings (higher efficiency = more savings)
-        if cooling_efficiency > 0.8:
-            climate_savings += site_revenue * 0.3  # 30% savings for high efficiency
-    
-    # Create optimization result
-    optimization = GlobalOptimization(
-        timestamp=datetime.now().isoformat(),
-        total_revenue=total_revenue,
-        climate_savings=climate_savings,
-        timezone_optimization=total_revenue * 0.15,  # 15% from timezone optimization
-        sla_performance={"premium": 99.9, "standard": 96.2, "flexible": 91.5, "spot": 85.0},
-        claude_reasoning=claude_reasoning
-    )
-    
-    # Store in history
-    global_state["optimization_history"].append(optimization)
-    global_state["total_revenue"] = total_revenue
-    
-    return optimization
+        logger.info(f"Optimization completed. Total revenue: ${total_revenue:.2f}")
+        
+        # Return as Pydantic model
+        return GlobalOptimization(
+            timestamp=optimization_data["timestamp"].isoformat(),
+            total_revenue=optimization_data["total_revenue"],
+            climate_savings=optimization_data["climate_savings"],
+            timezone_optimization=optimization_data["timezone_optimization"],
+            sla_performance=optimization_data["sla_performance"],
+            claude_reasoning=optimization_data["claude_reasoning"]
+        )
+    except Exception as e:
+        logger.error(f"Optimization failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Optimization failed: {str(e)}")
 
 @app.post("/api/sla/request")
-async def request_sla(sla_request: SLARequest):
+async def request_sla(sla_request: SLARequest, db: Session = Depends(get_db)):
     """Request SLA allocation"""
-    if sla_request.tier not in SLA_TIERS:
-        raise HTTPException(status_code=400, detail="Invalid SLA tier")
-    
-    # Update SLA commitments
-    global_state["sla_commitments"][sla_request.tier] += sla_request.power_requirement
-    
-    # Find optimal site for this SLA tier
-    optimal_site = None
-    best_score = 0
-    
-    for site_id, site_config in MULTI_SITE_CONFIG.items():
-        # Score based on cooling efficiency and energy cost
-        score = (site_config["climate"]["cooling_efficiency"] * 0.7 + 
-                (1 - site_config["energy_cost_multiplier"]) * 0.3)
+    try:
+        if sla_request.tier not in SLA_TIERS:
+            raise HTTPException(status_code=400, detail="Invalid SLA tier")
         
-        if score > best_score:
-            best_score = score
-            optimal_site = site_id
-    
-    return {
-        "sla_tier": sla_request.tier,
-        "power_allocated": sla_request.power_requirement,
-        "optimal_site": optimal_site,
-        "estimated_uptime": SLA_TIERS[sla_request.tier]["uptime"],
-        "price_multiplier": SLA_TIERS[sla_request.tier]["price_multiplier"]
-    }
+        logger.info(f"SLA request received: {sla_request.tier}, {sla_request.power_requirement}MW")
+        
+        # Find optimal site for this SLA tier
+        optimal_site = None
+        best_score = 0
+        
+        for site_id, site_config in MULTI_SITE_CONFIG.items():
+            # Score based on cooling efficiency and energy cost
+            score = (site_config["climate"]["cooling_efficiency"] * 0.7 + 
+                    (1 - site_config["energy_cost_multiplier"]) * 0.3)
+            
+            if score > best_score:
+                best_score = score
+                optimal_site = site_id
+        
+        # Store SLA commitment in database
+        add_sla_commitment(
+            db,
+            tier=sla_request.tier,
+            power_requirement=sla_request.power_requirement,
+            duration_hours=sla_request.duration_hours,
+            optimal_site=optimal_site
+        )
+        
+        logger.info(f"SLA allocated to {optimal_site}")
+        
+        return {
+            "sla_tier": sla_request.tier,
+            "power_allocated": sla_request.power_requirement,
+            "optimal_site": optimal_site,
+            "estimated_uptime": SLA_TIERS[sla_request.tier]["uptime"],
+            "price_multiplier": SLA_TIERS[sla_request.tier]["price_multiplier"]
+        }
+    except Exception as e:
+        logger.error(f"SLA request failed: {e}")
+        raise HTTPException(status_code=500, detail=f"SLA request failed: {str(e)}")
 
 @app.get("/api/dashboard/metrics")
-async def get_dashboard_metrics():
+async def get_dashboard_metrics(db: Session = Depends(get_db)):
     """Get comprehensive dashboard metrics"""
-    # Update current prices with dummy data
-    global_state["current_prices"] = get_dummy_mara_prices()
-    
-    # Get sites status
-    sites_response = await get_sites_status()
-    
-    if "error" in sites_response or "sites" not in sites_response:
-        return {
-            "error": "System not initialized or sites data unavailable",
-            "sites_response": sites_response
-        }
-    
-    sites = sites_response["sites"]
-    
-    # Calculate revenue for each site if not present
-    for site in sites:
-        if "revenue" not in site:
-            # Calculate revenue based on power usage and efficiency
-            base_revenue = site.get("power_used", 0) * 0.1  # $0.1 per MW base rate
-            efficiency_multiplier = site.get("cooling_efficiency", 1.0)
-            site["revenue"] = base_revenue * efficiency_multiplier
+    try:
+        # Update current prices with dummy data and store in DB
+        pricing_data = get_dummy_mara_prices()
+        add_pricing_data(db, pricing_data)
         
-        # Ensure required fields exist with defaults
-        site.setdefault("site_id", site.get("id", "unknown"))
-        site.setdefault("cooling_efficiency", 0.8)
-        site.setdefault("power_used", 0)
+        # Get pricing as JSON-serializable format
+        pricing_data_json = pricing_data.copy()
+        pricing_data_json['timestamp'] = pricing_data['timestamp'].isoformat()
+        
+        # Get sites status
+        sites_response = await get_sites_status(db)
+        
+        if "error" in sites_response or "sites" not in sites_response:
+            return {
+                "error": "System not initialized or sites data unavailable",
+                "sites_response": sites_response
+            }
+        
+        sites = sites_response["sites"]
+        
+        # Calculate revenue for each site if not present
+        for site in sites:
+            if "revenue" not in site:
+                # Calculate revenue based on power usage and efficiency
+                base_revenue = site.get("power_used", 0) * 0.1  # $0.1 per MW base rate
+                efficiency_multiplier = site.get("cooling_efficiency", 1.0)
+                site["revenue"] = base_revenue * efficiency_multiplier
+            
+            # Ensure required fields exist with defaults
+            site.setdefault("site_id", site.get("id", "unknown"))
+            site.setdefault("cooling_efficiency", 0.8)
+            site.setdefault("power_used", 0)
+        
+        # Calculate global metrics with safe access
+        total_power_used = sum(site.get("power_used", 0) for site in sites)
+        total_revenue = sum(site.get("revenue", 0) for site in sites)
+        
+        # Calculate efficiency metrics with safe access
+        cooling_efficiencies = [site.get("cooling_efficiency", 0.8) for site in sites]
+        avg_cooling_efficiency = sum(cooling_efficiencies) / len(cooling_efficiencies) if cooling_efficiencies else 0.8
+        
+        # Calculate renewable energy usage safely
+        renewable_energy_usage = 0
+        if total_power_used > 0:
+            renewable_energy_usage = sum(
+                MULTI_SITE_CONFIG.get(site.get("site_id", site.get("id", "")), {}).get("climate", {}).get("renewable_energy", 0.5) * site.get("power_used", 0)
+                for site in sites
+            ) / total_power_used
     
-    # Calculate global metrics with safe access
-    total_power_used = sum(site.get("power_used", 0) for site in sites)
-    total_revenue = sum(site.get("revenue", 0) for site in sites)
-    
-    # Calculate efficiency metrics with safe access
-    cooling_efficiencies = [site.get("cooling_efficiency", 0.8) for site in sites]
-    avg_cooling_efficiency = sum(cooling_efficiencies) / len(cooling_efficiencies) if cooling_efficiencies else 0.8
-    
-    # Calculate renewable energy usage safely
-    renewable_energy_usage = 0
-    if total_power_used > 0:
-        renewable_energy_usage = sum(
-            MULTI_SITE_CONFIG.get(site.get("site_id", site.get("id", "")), {}).get("climate", {}).get("renewable_energy", 0.5) * site.get("power_used", 0)
-            for site in sites
-        ) / total_power_used
-    
-    return {
-        "global_metrics": {
-            "total_revenue": total_revenue,
-            "total_power_used": total_power_used,
-            "avg_cooling_efficiency": avg_cooling_efficiency,
-            "renewable_energy_usage": renewable_energy_usage,
-            "active_sites": len(sites)
-        },
-        "sites": sites,
-        "sla_commitments": global_state["sla_commitments"],
-        "optimization_history": global_state["optimization_history"][-10:],  # Last 10 optimizations
-        "current_prices": global_state["current_prices"]
-    }
+        # Get SLA commitments and optimization history from database
+        sla_commitments = get_active_sla_commitments(db)
+        optimization_history = get_optimization_history(db, limit=10)
+        current_prices = get_latest_pricing(db)
+        
+        return {
+            "global_metrics": {
+                "total_revenue": total_revenue,
+                "total_power_used": total_power_used,
+                "avg_cooling_efficiency": avg_cooling_efficiency,
+                "renewable_energy_usage": renewable_energy_usage,
+                "active_sites": len(sites)
+            },
+            "sites": sites,
+            "sla_commitments": sla_commitments,
+            "optimization_history": optimization_history,
+            "current_prices": current_prices
+        }
+    except Exception as e:
+        logger.error(f"Dashboard metrics error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get dashboard metrics: {str(e)}")
 
 @app.get("/api/debug/state")
-async def debug_global_state():
-    """Debug endpoint to check global state"""
-    return {
-        "is_initialized": is_initialized,
-        "has_current_prices": bool(global_state.get("current_prices")),
-        "current_prices_value": global_state.get("current_prices"),
-        "has_mara_inventory": bool(global_state.get("mara_inventory")),
-        "mara_inventory_keys": list(global_state.get("mara_inventory", {}).keys()) if isinstance(global_state.get("mara_inventory"), dict) else None,
-        "global_state_keys": list(global_state.keys()),
-        "data_source": "dummy_data"
-    }
+async def debug_global_state(db: Session = Depends(get_db)):
+    """Debug endpoint to check system state"""
+    try:
+        system_state = get_system_state(db)
+        current_prices = get_latest_pricing(db)
+        sla_commitments = get_active_sla_commitments(db)
+        site_count = len(get_all_site_inventories(db))
+        
+        return {
+            "is_initialized": system_state.is_initialized,
+            "has_current_prices": bool(current_prices),
+            "current_prices_value": current_prices,
+            "has_mara_inventory": bool(system_state.mara_inventory),
+            "mara_inventory_keys": list(system_state.mara_inventory.keys()) if system_state.mara_inventory else None,
+            "total_revenue": system_state.total_revenue,
+            "site_count": site_count,
+            "sla_commitments": sla_commitments,
+            "last_updated": system_state.last_updated.isoformat() if system_state.last_updated else None,
+            "data_source": "database"
+        }
+    except Exception as e:
+        logger.error(f"Debug state error: {e}")
+        return {"error": str(e)}
 
 @app.get("/api/hardware/inventory")
-async def get_hardware_inventory():
+async def get_hardware_inventory(db: Session = Depends(get_db)):
     """Get detailed hardware inventory across all sites"""
-    global site_hardware_inventory, is_initialized
-    
-    if not is_initialized:
-        return {"error": "System not initialized. Call /api/initialize first"}
-    
-    inventory_summary = {
-        "total_inventory": {
-            "miners": {"air": 0, "hydro": 0, "immersion": 0},
-            "inference": {"gpu": 0, "asic": 0}
-        },
-        "site_breakdown": {},
-        "hardware_specs": {}
-    }
-    
-    for site_id, inventory in site_hardware_inventory.items():
-        site_name = MULTI_SITE_CONFIG[site_id]["name"]
+    try:
+        # Check if system is initialized
+        system_state = get_system_state(db)
+        if not system_state.is_initialized:
+            return {"error": "System not initialized. Call /api/initialize first"}
         
-        # Add to site breakdown
-        inventory_summary["site_breakdown"][site_name] = {
-            "site_id": site_id,
-            "location": MULTI_SITE_CONFIG[site_id]["location"],
-            "hardware": {
-                "miners": {
-                    "air": inventory["miners"]["air"]["available"],
-                    "hydro": inventory["miners"]["hydro"]["available"], 
-                    "immersion": inventory["miners"]["immersion"]["available"]
-                },
-                "inference": {
-                    "gpu": inventory["inference"]["gpu"]["available"],
-                    "asic": inventory["inference"]["asic"]["available"]
-                }
+        # Get all site inventories from database
+        site_hardware_inventory = get_all_site_inventories(db)
+        
+        inventory_summary = {
+            "total_inventory": {
+                "miners": {"air": 0, "hydro": 0, "immersion": 0},
+                "inference": {"gpu": 0, "asic": 0}
             },
-            "power_capacity": inventory["site_specs"]["power_capacity"],
-            "cooling_efficiency": inventory["site_specs"]["cooling_efficiency"]
+            "site_breakdown": {},
+            "hardware_specs": {}
         }
         
-        # Add to totals
-        inventory_summary["total_inventory"]["miners"]["air"] += inventory["miners"]["air"]["available"]
-        inventory_summary["total_inventory"]["miners"]["hydro"] += inventory["miners"]["hydro"]["available"]
-        inventory_summary["total_inventory"]["miners"]["immersion"] += inventory["miners"]["immersion"]["available"]
-        inventory_summary["total_inventory"]["inference"]["gpu"] += inventory["inference"]["gpu"]["available"]
-        inventory_summary["total_inventory"]["inference"]["asic"] += inventory["inference"]["asic"]["available"]
-        
-        # Store hardware specs (same across all sites from MARA)
-        if not inventory_summary["hardware_specs"]:
-            inventory_summary["hardware_specs"] = {
-                "miners": {
-                    "air": {"hashrate": inventory["miners"]["air"]["hashrate"], "power": inventory["miners"]["air"]["power"]},
-                    "hydro": {"hashrate": inventory["miners"]["hydro"]["hashrate"], "power": inventory["miners"]["hydro"]["power"]},
-                    "immersion": {"hashrate": inventory["miners"]["immersion"]["hashrate"], "power": inventory["miners"]["immersion"]["power"]}
+        for site_id, inventory in site_hardware_inventory.items():
+            site_name = MULTI_SITE_CONFIG[site_id]["name"]
+            
+            # Add to site breakdown
+            inventory_summary["site_breakdown"][site_name] = {
+                "site_id": site_id,
+                "location": MULTI_SITE_CONFIG[site_id]["location"],
+                "hardware": {
+                    "miners": {
+                        "air": inventory["miners"]["air"]["available"],
+                        "hydro": inventory["miners"]["hydro"]["available"], 
+                        "immersion": inventory["miners"]["immersion"]["available"]
+                    },
+                    "inference": {
+                        "gpu": inventory["inference"]["gpu"]["available"],
+                        "asic": inventory["inference"]["asic"]["available"]
+                    }
                 },
-                "inference": {
-                    "gpu": {"tokens": inventory["inference"]["gpu"]["tokens"], "power": inventory["inference"]["gpu"]["power"]},
-                    "asic": {"tokens": inventory["inference"]["asic"]["tokens"], "power": inventory["inference"]["asic"]["power"]}
-                }
+                "power_capacity": inventory["site_specs"]["power_capacity"],
+                "cooling_efficiency": inventory["site_specs"]["cooling_efficiency"]
             }
+            
+            # Add to totals
+            inventory_summary["total_inventory"]["miners"]["air"] += inventory["miners"]["air"]["available"]
+            inventory_summary["total_inventory"]["miners"]["hydro"] += inventory["miners"]["hydro"]["available"]
+            inventory_summary["total_inventory"]["miners"]["immersion"] += inventory["miners"]["immersion"]["available"]
+            inventory_summary["total_inventory"]["inference"]["gpu"] += inventory["inference"]["gpu"]["available"]
+            inventory_summary["total_inventory"]["inference"]["asic"] += inventory["inference"]["asic"]["available"]
+            
+            # Store hardware specs (same across all sites from MARA)
+            if not inventory_summary["hardware_specs"]:
+                inventory_summary["hardware_specs"] = {
+                    "miners": {
+                        "air": {"hashrate": inventory["miners"]["air"]["hashrate"], "power": inventory["miners"]["air"]["power"]},
+                        "hydro": {"hashrate": inventory["miners"]["hydro"]["hashrate"], "power": inventory["miners"]["hydro"]["power"]},
+                        "immersion": {"hashrate": inventory["miners"]["immersion"]["hashrate"], "power": inventory["miners"]["immersion"]["power"]}
+                    },
+                    "inference": {
+                        "gpu": {"tokens": inventory["inference"]["gpu"]["tokens"], "power": inventory["inference"]["gpu"]["power"]},
+                        "asic": {"tokens": inventory["inference"]["asic"]["tokens"], "power": inventory["inference"]["asic"]["power"]}
+                    }
+                }
     
-    return {
-        "inventory": inventory_summary,
-        "data_source": "dummy_data",
-        "last_updated": datetime.now().isoformat()
-    }
+        return {
+            "inventory": inventory_summary,
+            "data_source": "database",
+            "last_updated": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Hardware inventory error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get hardware inventory: {str(e)}")
 
-# Background task to update prices every 5 minutes
-async def periodic_price_update():
-    """Update prices every 5 minutes"""
-    while True:
-        try:
-            global_state["current_prices"] = get_dummy_mara_prices()
-            await asyncio.sleep(300)  # 5 minutes
-        except Exception as e:
-            print(f"Error in periodic price update: {e}")
-            await asyncio.sleep(60)  # Retry in 1 minute on error
+# Health check endpoint for monitoring
+@app.get("/api/health")
+async def health_check(db: Session = Depends(get_db)):
+    """Health check endpoint"""
+    try:
+        system_state = get_system_state(db)
+        return {
+            "status": "healthy",
+            "initialized": system_state.is_initialized,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
 def calculate_efficiency_score(site_config: Dict, weather: Dict) -> float:
     """Calculate site efficiency score based on various factors"""
