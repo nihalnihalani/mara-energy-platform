@@ -1,103 +1,121 @@
-# SLA-Smart Energy Arbitrage Platform
+# <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/bolt.svg" width="40" height="40"> SLA-Smart Energy Arbitrage Platform
 
 <div align="center">
 
-![Platform Status](https://img.shields.io/badge/status-production--ready-success)
-![Python](https://img.shields.io/badge/python-3.9+-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-orange)
-![License](https://img.shields.io/badge/license-MIT-blue)
+![Platform Status](https://img.shields.io/badge/status-production--ready-success?style=for-the-badge)
+![Python](https://img.shields.io/badge/python-3.9+-blue?style=for-the-badge&logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green?style=for-the-badge&logo=fastapi)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-orange?style=for-the-badge)
 
-**AI-Powered Global Energy Arbitrage System for Data Centers**
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trophy.svg" width="30" height="30"> **MARA Hackathon 2025 - TOP 5 FINALIST**
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/bitcoin.svg" width="30" height="30"> **Top Runner for 1 Bitcoin Grand Prize**
 
-*Maximize profit and energy efficiency across 10 geographically distributed data centers through intelligent resource allocation between Bitcoin mining and AI inference services.*
+**AI-Powered Global Energy Arbitrage System for Bitcoin Mining & AI Inference**
 
-[Features](#features) • [Quick Start](#quick-start) • [API Documentation](#api-documentation) • [Architecture](#architecture) • [Deployment](#deployment)
+*Maximize profit and energy efficiency across 10 geographically distributed data centers through intelligent resource allocation*
+
+[<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/book.svg" width="20" height="20"> Features](#-features) • [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/rocket.svg" width="20" height="20"> Quick Start](#-quick-start) • [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/code.svg" width="20" height="20"> API Documentation](#-api-documentation) • [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/server.svg" width="20" height="20"> Architecture](#-architecture)
 
 </div>
 
 ---
 
-## Table of Contents
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/award.svg" width="30" height="30"> Hackathon Achievement
 
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [API Documentation](#api-documentation)
-- [Database Schema](#database-schema)
-- [Frontend Features](#frontend-features)
-- [Deployment](#deployment)
-- [Testing](#testing)
-- [Performance](#performance)
-- [Security](#security)
-- [Contributing](#contributing)
-- [License](#license)
+<div align="center">
+
+### **MARA Hackathon 2025 - Fort Mason, San Francisco**
+
+**TOP 5 FINALIST** out of hundreds of submissions
+
+**TOP RUNNER** for the **1 Bitcoin Grand Prize**
+
+This platform demonstrated cutting-edge innovation in energy arbitrage optimization, combining AI-powered decision making with real-time climate intelligence to maximize mining profitability while minimizing environmental impact.
+
+</div>
 
 ---
 
-## Overview
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/list.svg" width="25" height="25"> Table of Contents
 
-The SLA-Smart Energy Arbitrage Platform is a sophisticated enterprise-grade system that optimizes compute resource allocation across 10 global data centers. By leveraging real-time climate data, timezone intelligence, and AI-powered decision making, the platform maximizes revenue while minimizing energy costs through strategic workload placement.
-
-### Core Value Proposition
-
-- **35-55% Cooling Cost Savings** through climate-aware routing
-- **20-30% Revenue Increase** via timezone optimization
-- **99.9% Uptime** for premium SLA commitments
-- **Real-time Optimization** using Claude AI
-- **Multi-Revenue Streams** from mining and AI inference
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/eye.svg" width="15"> Overview](#-overview)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/star.svg" width="15"> Key Features](#-key-features)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cube.svg" width="15"> Architecture](#-architecture)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/layer-group.svg" width="15"> Technology Stack](#-technology-stack)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/download.svg" width="15"> Installation](#-installation)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cog.svg" width="15"> Configuration](#-configuration)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/plug.svg" width="15"> API Documentation](#-api-documentation)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/database.svg" width="15"> Database Schema](#-database-schema)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/desktop.svg" width="15"> Frontend Features](#-frontend-features)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud-upload-alt.svg" width="15"> Deployment](#-deployment)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/vial.svg" width="15"> Testing](#-testing)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/tachometer-alt.svg" width="15"> Performance](#-performance)
+- [<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/shield-alt.svg" width="15"> Security](#-security)
 
 ---
 
-## Key Features
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/eye.svg" width="25" height="25"> Overview
 
-### Global Multi-Site Management
+The **SLA-Smart Energy Arbitrage Platform** is an award-winning, enterprise-grade system that revolutionizes compute resource allocation across 10 global data centers. By leveraging real-time climate data, timezone intelligence, and Claude AI-powered decision making, the platform maximizes revenue while minimizing energy costs through strategic workload placement.
+
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/chart-line.svg" width="20" height="20"> Core Value Proposition
+
+| Metric | Achievement |
+|--------|-------------|
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/snowflake.svg" width="15"> **Cooling Cost Savings** | 35-55% through climate-aware routing |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/dollar-sign.svg" width="15"> **Revenue Increase** | 20-30% via timezone optimization |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/clock.svg" width="15"> **Uptime Guarantee** | 99.9% for premium SLA commitments |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/brain.svg" width="15"> **AI Optimization** | Real-time using Claude AI |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/coins.svg" width="15"> **Multi-Revenue** | Bitcoin mining + AI inference |
+
+---
+
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/star.svg" width="25" height="25"> Key Features
+
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/globe.svg" width="20" height="20"> Global Multi-Site Management
 
 | Feature | Description |
 |---------|-------------|
-| **10 Data Centers** | Strategic locations: Iceland, Norway, Canada, Ireland, Germany, Chile, Japan, Australia, Texas, Singapore |
-| **Climate Intelligence** | Automatic routing to cold-climate sites for optimal cooling efficiency |
-| **Timezone Optimization** | Follow-the-sun routing for AI inference during peak business hours |
-| **Hardware Specialization** | Site-specific GPU/ASIC ratios based on local conditions |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/building.svg" width="15"> 10 Data Centers** | Strategic locations: Iceland, Norway, Canada, Ireland, Germany, Chile, Japan, Australia, Texas, Singapore |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/temperature-low.svg" width="15"> Climate Intelligence** | Automatic routing to cold-climate sites for optimal cooling efficiency |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/sun.svg" width="15"> Timezone Optimization** | Follow-the-sun routing for AI inference during peak business hours |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/microchip.svg" width="15"> Hardware Specialization** | Site-specific GPU/ASIC ratios based on local conditions |
 
-### SLA-Tiered Pricing System
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/handshake.svg" width="20" height="20"> SLA-Tiered Pricing System
 
-| Tier | Uptime | Price Multiplier | Priority | Use Case |
-|------|--------|------------------|----------|----------|
-| **Premium** | 99.9% | 3.5x | Highest | Mission-critical AI workloads |
-| **Standard** | 95.0% | 2.0x | High | Production services |
-| **Flexible** | 90.0% | 1.2x | Medium | Development & testing |
-| **Spot** | Best Effort | 0.4x | Low | Batch processing |
+| Tier | <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/heartbeat.svg" width="15"> Uptime | <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/money-bill-wave.svg" width="15"> Price | <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/arrow-up.svg" width="15"> Priority | Use Case |
+|------|--------|-------|----------|----------|
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/crown.svg" width="15"> Premium** | 99.9% | 3.5x | Highest | Mission-critical AI workloads |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/check-circle.svg" width="15"> Standard** | 95.0% | 2.0x | High | Production services |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/exchange-alt.svg" width="15"> Flexible** | 90.0% | 1.2x | Medium | Development & testing |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/random.svg" width="15"> Spot** | Best Effort | 0.4x | Low | Batch processing |
 
-### AI-Powered Optimization
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/brain.svg" width="20" height="20"> AI-Powered Optimization
 
-- **Claude AI Integration** for intelligent resource allocation
-- **Real-time Analysis** of 10 sites simultaneously
-- **Predictive Routing** based on weather and demand patterns
-- **Dynamic Rebalancing** every 5 minutes
-- **Historical Performance** tracking and learning
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/robot.svg" width="15"> **Claude AI Integration** for intelligent resource allocation
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/sync.svg" width="15"> **Real-time Analysis** of 10 sites simultaneously
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/route.svg" width="15"> **Predictive Routing** based on weather and demand patterns
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/balance-scale.svg" width="15"> **Dynamic Rebalancing** every 5 minutes
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/history.svg" width="15"> **Historical Performance** tracking and learning
 
-### Enterprise Features
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/building.svg" width="20" height="20"> Enterprise Features
 
-- **SQLite Database** for persistent data storage
-- **RESTful API** with 8 comprehensive endpoints
-- **Real-time Dashboard** with live metrics
-- **Structured Logging** for audit trails
-- **CORS Security** with configurable origins
-- **Health Monitoring** with status endpoints
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/database.svg" width="15"> **SQLite Database** for persistent data storage
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/plug.svg" width="15"> **RESTful API** with 8 comprehensive endpoints
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/chart-area.svg" width="15"> **Real-time Dashboard** with live metrics
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/file-alt.svg" width="15"> **Structured Logging** for audit trails
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/shield-alt.svg" width="15"> **CORS Security** with configurable origins
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/heartbeat.svg" width="15"> **Health Monitoring** with status endpoints
 
 ---
 
-## Architecture
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cube.svg" width="25" height="25"> Architecture
 
-### System Architecture
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/sitemap.svg" width="20" height="20"> System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        FRONTEND LAYER                            │
+│                   🖥️  FRONTEND LAYER                            │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │  Dashboard (HTML/CSS/JS) + Charts.js + Leaflet Maps      │  │
 │  └──────────────────────────────────────────────────────────┘  │
@@ -105,7 +123,7 @@ The SLA-Smart Energy Arbitrage Platform is a sophisticated enterprise-grade syst
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                         API LAYER (FastAPI)                      │
+│                    ⚡ API LAYER (FastAPI)                        │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │  8 RESTful Endpoints + WebSocket Support + CORS          │  │
 │  └──────────────────────────────────────────────────────────┘  │
@@ -114,169 +132,152 @@ The SLA-Smart Energy Arbitrage Platform is a sophisticated enterprise-grade syst
         ┌─────────────────────┼─────────────────────┐
         ▼                     ▼                     ▼
 ┌───────────────┐   ┌──────────────────┐   ┌──────────────┐
-│  Claude AI    │   │  SQLite Database │   │  Pricing API │
-│  Optimization │   │  (SQLAlchemy)    │   │  (Mock/Real) │
+│  🤖 Claude AI │   │  💾 SQLite DB    │   │  💰 Pricing  │
+│  Optimization │   │  (SQLAlchemy)    │   │  API         │
 └───────────────┘   └──────────────────┘   └──────────────┘
         │                     │                     │
         └─────────────────────┼─────────────────────┘
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    10 GLOBAL DATA CENTERS                        │
-│  Iceland • Norway • Canada • Ireland • Germany                   │
-│  Chile • Japan • Australia • Texas • Singapore                   │
+│               🌍 10 GLOBAL DATA CENTERS                          │
+│  🇮🇸 Iceland • 🇳🇴 Norway • 🇨🇦 Canada • 🇮🇪 Ireland • 🇩🇪 Germany   │
+│  🇨🇱 Chile • 🇯🇵 Japan • 🇦🇺 Australia • 🇺🇸 Texas • 🇸🇬 Singapore      │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Data Flow
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/project-diagram.svg" width="20" height="20"> Data Flow
 
-1. **Monitor**: Track weather, timezone demand, energy prices across all sites
-2. **Analyze**: Calculate site-specific profitability considering climate, energy costs, and demand
-3. **Optimize**: Claude AI determines optimal workload placement
-4. **Route**: Allocate resources to maximize revenue and efficiency
-5. **Protect**: Ensure SLA commitments are maintained across regions
-6. **Track**: Log performance metrics and compliance data
+1. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/eye.svg" width="15"> Monitor**: Track weather, timezone demand, energy prices across all sites
+2. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/calculator.svg" width="15"> Analyze**: Calculate site-specific profitability considering climate, energy costs, and demand
+3. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/magic.svg" width="15"> Optimize**: Claude AI determines optimal workload placement
+4. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/route.svg" width="15"> Route**: Allocate resources to maximize revenue and efficiency
+5. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/shield-alt.svg" width="15"> Protect**: Ensure SLA commitments are maintained across regions
+6. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/chart-line.svg" width="15"> Track**: Log performance metrics and compliance data
 
 ---
 
-## Technology Stack
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/layer-group.svg" width="25" height="25"> Technology Stack
 
-### Backend
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/server.svg" width="20" height="20"> Backend
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Python** | 3.9+ | Core application language |
-| **FastAPI** | 0.104+ | High-performance async web framework |
-| **SQLAlchemy** | 2.0+ | ORM and database management |
-| **Pydantic** | 2.8+ | Data validation and serialization |
-| **Anthropic** | 0.7+ | Claude AI integration |
-| **Uvicorn** | 0.24+ | ASGI server |
-| **Alembic** | 1.12+ | Database migrations |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/python.svg" width="15"> Python** | 3.9+ | Core application language |
+| **⚡ FastAPI** | 0.104+ | High-performance async web framework |
+| **💾 SQLAlchemy** | 2.0+ | ORM and database management |
+| **✓ Pydantic** | 2.8+ | Data validation and serialization |
+| **🤖 Anthropic** | 0.7+ | Claude AI integration |
+| **🚀 Uvicorn** | 0.24+ | ASGI server |
+| **📊 Alembic** | 1.12+ | Database migrations |
 
-### Frontend
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/desktop.svg" width="20" height="20"> Frontend
 
 | Technology | Purpose |
 |------------|---------|
-| **Vanilla JavaScript** | Modern ES6+ with async/await |
-| **Chart.js** | Real-time data visualization |
-| **Leaflet.js** | Interactive world map |
-| **Font Awesome** | Icon library |
-| **CSS3** | Responsive design with glassmorphism |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/js.svg" width="15"> JavaScript** | Modern ES6+ with async/await |
+| **📊 Chart.js** | Real-time data visualization |
+| **🗺️ Leaflet.js** | Interactive world map |
+| **🎨 Font Awesome** | Icon library |
+| **🎨 CSS3** | Responsive design with glassmorphism |
 
-### Infrastructure
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud.svg" width="20" height="20"> Infrastructure
 
 | Component | Technology |
 |-----------|------------|
-| **Database** | SQLite (dev) / PostgreSQL (prod) |
-| **Deployment** | Vercel serverless functions |
-| **Version Control** | Git + GitHub |
-| **Environment** | python-dotenv |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/database.svg" width="15"> Database** | SQLite (dev) / PostgreSQL (prod) |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud-upload-alt.svg" width="15"> Deployment** | Vercel serverless functions |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/git-alt.svg" width="15"> Version Control** | Git + GitHub |
+| **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cog.svg" width="15"> Environment** | python-dotenv |
 
 ---
 
-## Installation
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/download.svg" width="25" height="25"> Installation
 
-### Prerequisites
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/clipboard-check.svg" width="20" height="20"> Prerequisites
 
-- Python 3.9 or higher
-- pip (Python package manager)
-- Git
-- Node.js (optional, for frontend development)
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/python.svg" width="15"> Python 3.9 or higher
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cube.svg" width="15"> pip (Python package manager)
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/git-alt.svg" width="15"> Git
 
-### Step 1: Clone Repository
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/list-ol.svg" width="20" height="20"> Step-by-Step Installation
+
+#### Step 1: Clone Repository
 
 ```bash
 git clone https://github.com/nihalnihalani/mara-energy-platform.git
 cd mara-energy-platform
 ```
 
-### Step 2: Install Dependencies
+#### Step 2: Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 3: Configure Environment
+#### Step 3: Configure Environment
 
 ```bash
 cp config.env.example config.env
 # Edit config.env with your settings
 ```
 
-### Step 4: Initialize Database
+#### Step 4: Initialize Database
 
 The database is automatically initialized on first run. The SQLite file will be created as `energy_platform.db`.
 
-### Step 5: Run Application
+#### Step 5: Run Application
 
 ```bash
 python main.py
 ```
 
-The application will start on `http://localhost:8000`
+<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/check-circle.svg" width="15"> The application will start on `http://localhost:8000`
 
 ---
 
-## Configuration
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cog.svg" width="25" height="25"> Configuration
 
-### Environment Variables
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/key.svg" width="20" height="20"> Environment Variables
 
 Create a `config.env` file in the project root:
 
 ```bash
-# Claude API Configuration
+# 🤖 Claude API Configuration
 CLAUDE_API_KEY=your_claude_api_key_here
 
-# Database Configuration
+# 💾 Database Configuration
 DATABASE_URL=sqlite:///./energy_platform.db
 
-# Application Settings
+# ⚙️ Application Settings
 APP_ENV=development
 DEBUG=True
 
-# CORS Settings (comma-separated origins)
+# 🔒 CORS Settings (comma-separated origins)
 ALLOWED_ORIGINS=http://localhost:8000,http://localhost:3000,https://your-app.vercel.app
 
-# Logging Configuration
+# 📝 Logging Configuration
 LOG_LEVEL=INFO
 LOG_FILE=app.log
 
-# Background Task Configuration
+# ⏰ Background Task Configuration
 PRICE_UPDATE_INTERVAL=300  # 5 minutes in seconds
 
-# Security
+# 🔐 Security
 SECRET_KEY=your-secret-key-change-in-production
-```
-
-### Site Configuration
-
-The platform includes 10 pre-configured data centers in `main.py`:
-
-```python
-MULTI_SITE_CONFIG = {
-    "site_1_nordic": {
-        "name": "Nordic Iceland",
-        "location": {"lat": 64.1466, "lon": -21.9426, "timezone": "Atlantic/Reykjavik"},
-        "climate": {"avg_temp": 35, "cooling_efficiency": 0.95, "renewable_energy": 0.9},
-        "hardware_profile": {"gpu_ratio": 0.6, "asic_ratio": 0.4, "cooling_type": "free_air"},
-        "power_capacity": 1000000,
-        "energy_cost_multiplier": 0.6
-    },
-    # ... 9 more sites
-}
 ```
 
 ---
 
-## API Documentation
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/plug.svg" width="25" height="25"> API Documentation
 
-### Base URL
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/link.svg" width="20" height="20"> Base URL
 
-- **Local**: `http://localhost:8000`
-- **Production**: `https://your-app.vercel.app`
+- **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/laptop.svg" width="15"> Local**: `http://localhost:8000`
+- **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/globe.svg" width="15"> Production**: `https://your-app.vercel.app`
 
-### Endpoints
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/list.svg" width="20" height="20"> Endpoints
 
-#### 1. Health Check
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/heartbeat.svg" width="18"> 1. Health Check
 
 ```http
 GET /api/health
@@ -291,7 +292,7 @@ GET /api/health
 }
 ```
 
-#### 2. Initialize System
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/power-off.svg" width="18"> 2. Initialize System
 
 ```http
 POST /api/initialize
@@ -311,7 +312,7 @@ POST /api/initialize
 }
 ```
 
-#### 3. Get Sites Status
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/server.svg" width="18"> 3. Get Sites Status
 
 ```http
 GET /api/sites/status
@@ -331,15 +332,11 @@ GET /api/sites/status
       "revenue": 12500.50
     }
   ],
-  "total_sites": 10,
-  "global_metrics": {
-    "total_power_used": 450000,
-    "average_efficiency": 0.82
-  }
+  "total_sites": 10
 }
 ```
 
-#### 4. Run Global Optimization
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/brain.svg" width="18"> 4. Run Global Optimization
 
 ```http
 POST /api/optimize
@@ -356,7 +353,7 @@ POST /api/optimize
 }
 ```
 
-#### 5. Request SLA
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/handshake.svg" width="18"> 5. Request SLA
 
 ```http
 POST /api/sla/request
@@ -369,192 +366,85 @@ Content-Type: application/json
 }
 ```
 
-**Response:**
-```json
-{
-  "sla_tier": "premium",
-  "power_allocated": 100,
-  "optimal_site": "site_1_nordic",
-  "estimated_uptime": 99.9,
-  "price_multiplier": 3.5
-}
-```
-
-#### 6. Get Dashboard Metrics
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/chart-bar.svg" width="18"> 6. Get Dashboard Metrics
 
 ```http
 GET /api/dashboard/metrics
 ```
 
-**Response:**
-```json
-{
-  "global_metrics": {
-    "total_revenue": 31925.93,
-    "total_power_used": 450000,
-    "avg_cooling_efficiency": 0.78,
-    "renewable_energy_usage": 0.65,
-    "active_sites": 10
-  },
-  "sites": [...],
-  "sla_commitments": {
-    "premium": 100,
-    "standard": 200,
-    "flexible": 150,
-    "spot": 50
-  }
-}
-```
-
-#### 7. Get Hardware Inventory
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/boxes.svg" width="18"> 7. Get Hardware Inventory
 
 ```http
 GET /api/hardware/inventory
 ```
 
-**Response:**
-```json
-{
-  "inventory": {
-    "total_inventory": {
-      "miners": {"air": 500, "hydro": 200, "immersion": 100},
-      "inference": {"gpu": 590, "asic": 193}
-    },
-    "site_breakdown": {...}
-  }
-}
-```
-
-#### 8. Debug System State
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/bug.svg" width="18"> 8. Debug System State
 
 ```http
 GET /api/debug/state
 ```
 
-**Response:**
-```json
-{
-  "is_initialized": true,
-  "site_count": 10,
-  "has_current_prices": true,
-  "total_revenue": 21710468.50,
-  "data_source": "database"
-}
-```
-
 ---
 
-## Database Schema
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/database.svg" width="25" height="25"> Database Schema
 
-### Tables
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/table.svg" width="20" height="20"> Tables
 
-#### 1. system_state
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cog.svg" width="15"> system_state
 Tracks global system state and initialization
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| is_initialized | BOOLEAN | System initialization status |
-| mara_inventory | JSON | Global hardware inventory |
-| current_prices | JSON | Latest pricing data |
-| total_revenue | FLOAT | Cumulative revenue |
-| last_updated | DATETIME | Last update timestamp |
-
-#### 2. site_hardware_inventory
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/boxes.svg" width="15"> site_hardware_inventory
 Hardware inventory per site
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| site_id | STRING | Unique site identifier |
-| inventory_data | JSON | Complete inventory details |
-| last_updated | DATETIME | Last update timestamp |
-
-#### 3. site_allocations
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/sliders-h.svg" width="15"> site_allocations
 Current resource allocation per site
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| site_id | STRING | Site identifier |
-| allocation_data | JSON | GPU/ASIC/miner allocation |
-| timestamp | DATETIME | Allocation timestamp |
-
-#### 4. sla_commitments
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/file-contract.svg" width="15"> sla_commitments
 SLA commitments and tracking
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| tier | STRING | SLA tier (premium/standard/flexible/spot) |
-| power_requirement | INTEGER | Power in MW |
-| duration_hours | INTEGER | Duration in hours |
-| optimal_site | STRING | Assigned site |
-| created_at | DATETIME | Creation timestamp |
-| active | BOOLEAN | Active status |
-
-#### 5. optimization_history
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/history.svg" width="15"> optimization_history
 Historical optimization runs
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| timestamp | DATETIME | Optimization timestamp |
-| total_revenue | FLOAT | Revenue generated |
-| climate_savings | FLOAT | Climate savings amount |
-| timezone_optimization | FLOAT | Timezone optimization gain |
-| sla_performance | JSON | SLA performance metrics |
-| claude_reasoning | STRING | AI reasoning text |
-
-#### 6. pricing_data
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/dollar-sign.svg" width="15"> pricing_data
 Historical pricing information
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key |
-| energy_price | FLOAT | Energy price per unit |
-| hash_price | FLOAT | Hash rate price |
-| token_price | FLOAT | Token inference price |
-| timestamp | DATETIME | Price timestamp |
-| source | STRING | Data source (dummy/real) |
 
 ---
 
-## Frontend Features
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/desktop.svg" width="25" height="25"> Frontend Features
 
-### Dashboard Components
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/th-large.svg" width="20" height="20"> Dashboard Components
 
-1. **Global Metrics Cards**
+1. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/chart-line.svg" width="15"> Global Metrics Cards**
    - Total Revenue with trend
    - Power Usage across all sites
    - Cooling Efficiency average
    - Renewable Energy percentage
 
-2. **Interactive World Map**
+2. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/map-marked-alt.svg" width="15"> Interactive World Map**
    - Leaflet.js powered map
    - Site markers color-coded by efficiency
    - Click for detailed site information
    - Real-time updates every 30 seconds
 
-3. **SLA Management Panel**
+3. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/handshake.svg" width="15"> SLA Management Panel**
    - 4-tier SLA visualization
    - Request new SLA allocations
    - View current commitments
    - Automatic optimal site routing
 
-4. **Site Performance Grid**
+4. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/server.svg" width="15"> Site Performance Grid**
    - 10 site cards with live metrics
    - Temperature, efficiency, revenue
    - Hardware allocation details
    - Power utilization percentages
 
-5. **Claude AI Optimizer**
+5. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/robot.svg" width="15"> Claude AI Optimizer**
    - Real-time AI analysis display
    - Climate savings calculation
    - Timezone optimization metrics
    - One-click optimization trigger
 
-6. **Performance Charts**
+6. **<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/chart-area.svg" width="15"> Performance Charts**
    - Revenue optimization line chart
    - Climate efficiency doughnut chart
    - Historical trend analysis
@@ -562,89 +452,44 @@ Historical pricing information
 
 ---
 
-## Deployment
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud-upload-alt.svg" width="25" height="25"> Deployment
 
-### Vercel Deployment
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/rocket.svg" width="20" height="20"> Vercel Deployment
 
-#### Prerequisites
+The project includes pre-configured `vercel.json` for seamless deployment.
 
-- Vercel account
-- GitHub repository connected to Vercel
-
-#### Step 1: Configure Vercel
-
-The project includes a pre-configured `vercel.json`:
-
-```json
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    }
-  ]
-}
-```
-
-#### Step 2: Set Environment Variables
-
-In Vercel dashboard, add:
-
-```
-CLAUDE_API_KEY=your_actual_claude_api_key
-DATABASE_URL=postgresql://user:pass@host:5432/db  # Use PostgreSQL for production
-ALLOWED_ORIGINS=https://your-app.vercel.app
-```
-
-#### Step 3: Deploy
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/terminal.svg" width="18"> Deploy with Vercel CLI
 
 ```bash
-# Using Vercel CLI
 npm i -g vercel
 vercel deploy
+```
 
-# Or push to GitHub (auto-deploys if connected)
+#### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/github.svg" width="18"> Deploy via GitHub Integration
+
+Push to GitHub - Vercel auto-deploys if connected:
+
+```bash
 git push origin main
 ```
 
-### Alternative Deployment Options
-
-#### Docker
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/docker.svg" width="20" height="20"> Docker Deployment
 
 ```dockerfile
 FROM python:3.9-slim
-
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-
 COPY . .
-
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-#### AWS Lambda
-
-Use Mangum adapter for AWS Lambda deployment:
-
-```python
-from mangum import Mangum
-handler = Mangum(app)
-```
-
 ---
 
-## Testing
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/vial.svg" width="25" height="25"> Testing
 
-### Running Tests
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/play.svg" width="20" height="20"> Running Tests
 
 ```bash
 # Install test dependencies
@@ -654,7 +499,7 @@ pip install pytest pytest-asyncio httpx
 pytest tests/
 ```
 
-### Manual API Testing
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/terminal.svg" width="20" height="20"> Manual API Testing
 
 ```bash
 # Initialize system
@@ -665,150 +510,74 @@ curl http://localhost:8000/api/sites/status
 
 # Run optimization
 curl -X POST http://localhost:8000/api/optimize
-
-# Request SLA
-curl -X POST http://localhost:8000/api/sla/request \
-  -H "Content-Type: application/json" \
-  -d '{"tier":"premium","power_requirement":100,"duration_hours":24}'
 ```
 
 ---
 
-## Performance
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/tachometer-alt.svg" width="25" height="25"> Performance
 
-### Benchmarks
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/stopwatch.svg" width="20" height="20"> Benchmarks
 
 | Metric | Value |
 |--------|-------|
-| API Response Time | < 100ms (avg) |
-| Database Query Time | < 50ms (avg) |
-| Dashboard Load Time | < 2s |
-| Optimization Runtime | < 5s |
-| Concurrent Users | 1000+ |
-
-### Optimization Strategies
-
-- **Database Indexing**: Indexes on site_id, timestamp columns
-- **Connection Pooling**: SQLAlchemy connection pool
-- **Async Operations**: FastAPI async endpoints
-- **Caching**: In-memory caching for frequently accessed data
-- **Lazy Loading**: Frontend components load on demand
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/bolt.svg" width="15"> **API Response Time** | < 100ms (avg) |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/database.svg" width="15"> **Database Query Time** | < 50ms (avg) |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/desktop.svg" width="15"> **Dashboard Load Time** | < 2s |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/brain.svg" width="15"> **Optimization Runtime** | < 5s |
+| <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/users.svg" width="15"> **Concurrent Users** | 1000+ |
 
 ---
 
-## Security
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/shield-alt.svg" width="25" height="25"> Security
 
-### Implementation
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/check-square.svg" width="20" height="20"> Implementation
 
-- **CORS**: Restricted to specified origins
-- **Environment Variables**: Sensitive data in config.env
-- **SQL Injection**: Protected by SQLAlchemy ORM
-- **Input Validation**: Pydantic models validate all inputs
-- **Logging**: Structured audit logs for all operations
-- **Error Handling**: Generic error messages to clients
-
-### Best Practices
-
-1. Never commit `config.env` to version control
-2. Use strong SECRET_KEY in production
-3. Enable HTTPS in production
-4. Regular security audits of dependencies
-5. Implement rate limiting for API endpoints
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/globe.svg" width="15"> **CORS**: Restricted to specified origins
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/key.svg" width="15"> **Environment Variables**: Sensitive data in config.env
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/shield-alt.svg" width="15"> **SQL Injection**: Protected by SQLAlchemy ORM
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/check-circle.svg" width="15"> **Input Validation**: Pydantic models validate all inputs
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/file-alt.svg" width="15"> **Logging**: Structured audit logs for all operations
 
 ---
 
-## Contributing
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/code-branch.svg" width="25" height="25"> Contributing
 
-We welcome contributions! Please follow these guidelines:
-
-### Development Setup
-
-```bash
-# Fork and clone the repository
-git clone https://github.com/YOUR_USERNAME/mara-energy-platform.git
-
-# Create a feature branch
-git checkout -b feature/your-feature-name
-
-# Make changes and test
-python main.py
-
-# Commit with descriptive message
-git commit -m "Add: detailed description of changes"
-
-# Push to your fork
-git push origin feature/your-feature-name
-
-# Create a Pull Request
-```
-
-### Code Style
-
-- Follow PEP 8 for Python code
-- Use type hints for function signatures
-- Write docstrings for all functions
-- Add comments for complex logic
-- Keep functions under 50 lines
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
-## License
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/balance-scale.svg" width="25" height="25"> License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Acknowledgments
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trophy.svg" width="25" height="25"> Acknowledgments
 
-- **FastAPI** for the excellent web framework
-- **Anthropic** for Claude AI capabilities
-- **Vercel** for serverless deployment platform
-- **MARA Hackathon 2025** for the inspiration
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/bitcoin.svg" width="15"> **MARA Hackathon 2025** for the incredible opportunity and recognition
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/bolt.svg" width="15"> **FastAPI** for the excellent web framework
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/brain.svg" width="15"> **Anthropic** for Claude AI capabilities
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/cloud.svg" width="15"> **Vercel** for serverless deployment platform
 
 ---
 
-## Support
+## <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/life-ring.svg" width="25" height="25"> Support
 
 For questions, issues, or feature requests:
 
-- **GitHub Issues**: [Create an issue](https://github.com/nihalnihalani/mara-energy-platform/issues)
-- **Documentation**: [Read the docs](#documentation)
-- **Email**: support@mara-energy-platform.com
-
----
-
-## Roadmap
-
-### Phase 1 (Current)
-- [x] Core platform with 10 sites
-- [x] SQLite database integration
-- [x] Claude AI optimization
-- [x] REST API with 8 endpoints
-- [x] Interactive dashboard
-- [x] Vercel deployment ready
-
-### Phase 2 (Q1 2025)
-- [ ] PostgreSQL migration
-- [ ] Real-time WebSocket updates
-- [ ] Advanced analytics dashboard
-- [ ] Machine learning predictions
-- [ ] Multi-tenant support
-- [ ] Mobile app (iOS/Android)
-
-### Phase 3 (Q2 2025)
-- [ ] Blockchain integration
-- [ ] Carbon credit tracking
-- [ ] API marketplace
-- [ ] Custom hardware profiles
-- [ ] Advanced security features
-- [ ] Enterprise SSO
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/github.svg" width="15"> **GitHub Issues**: [Create an issue](https://github.com/nihalnihalani/mara-energy-platform/issues)
+- <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/book.svg" width="15"> **Documentation**: [Read the docs](#documentation)
 
 ---
 
 <div align="center">
 
-**Built with passion for the MARA Hackathon 2025**
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/heart.svg" width="20" height="20"> Built with passion for MARA Hackathon 2025
 
-[Back to Top](#sla-smart-energy-arbitrage-platform)
+### <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/trophy.svg" width="20" height="20"> TOP 5 FINALIST | <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/brands/bitcoin.svg" width="20" height="20"> TOP RUNNER FOR 1 BITCOIN GRAND PRIZE
+
+**Fort Mason, San Francisco**
+
+[<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/arrow-up.svg" width="15"> Back to Top](#-sla-smart-energy-arbitrage-platform)
 
 </div>
